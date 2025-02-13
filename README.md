@@ -193,3 +193,47 @@ Endpoints for retrieving and checking in on actionable steps.
 - **Retrieve All Reminders**
   - `GET /api/reminders`
   - Fetches all upcoming reminders and actionable steps.
+
+## Setting Up Access Token in Postman
+
+### **Option 1: Using "Tests" or "Pre-request Script"**
+
+1. Open **Postman**.
+2. Click on your **Login request**.
+3. Go to the **Tests** section (or **Pre-request Script** if "Tests" is unavailable).
+4. Paste this script:
+   ```javascript
+   const response = pm.response.json();
+   if (response.token && response.token.accessToken) {
+     pm.environment.set("accessToken", response.token.accessToken);
+   }
+   ```
+5. Send the login request.
+6. Go to **⚙️ Manage Environments** in Postman and verify `accessToken` is set.
+
+### **Option 2: Manually Set Token in Environment Variables**
+
+1. Run the **Login request**.
+2. Copy the `accessToken` from the response.
+3. Click **⚙️ Manage Environments** (top-right).
+4. Create a new variable:
+   - **Variable Name:** `accessToken`
+   - **Initial Value:** _(Paste your copied token)_
+   - **Current Value:** _(Same as initial value)_
+5. Click **Save**.
+
+### **Option 3: Use Token Directly in Requests**
+
+1. In **Authorization Tab** of your protected request:
+
+   - Select **Bearer Token**.
+   - In the **Token** field, type:
+     ```
+     {{accessToken}}
+     ```
+
+2. Or, in **Headers**, manually add:
+   - **Key:** `Authorization`
+   - **Value:** `Bearer {{accessToken}}`
+
+Now, whenever you send requests, Postman will use the stored token dynamically! 🚀
