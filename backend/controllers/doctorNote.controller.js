@@ -4,7 +4,7 @@ const { encryptData, decryptData } = require("../utils/encryption");
 const { processDoctorNotes } = require("../utils/llmIntegration");
 const { addDays } = require("date-fns");
 
-exports.submitDoctorNote = async (req, res) => {
+exports.submitDoctorNoteOld = async (req, res) => {
   try {
     const { patientId, note } = req.body;
     const encryptedNote = encryptData(note);
@@ -37,6 +37,62 @@ exports.submitDoctorNote = async (req, res) => {
       for (let i = 0; i < duration + missedDays; i++) {
         reminders.push({
           patient: patientId,
+          action: item.action,
+          dueDate: addDays(new Date(), i), // Schedule daily reminders
+          status: "pending",
+        });
+      }
+    });
+
+    // Insert reminders into database
+    if (reminders.length > 0) {
+      await Reminder.insertMany(reminders);
+    }
+
+    res
+      .status(201)
+      .json({ message: "Note processed and reminders scheduled." });
+  } catch (error) {
+    console.error("❌ Error:", error);
+    res
+      .status(500)
+      .json({ message: "Error processing note", error: error.message });
+  }
+};
+exports.submitDoctorNote = async (req, res) => {
+  try {
+    const { patientId, note } = req.body;
+    const encryptedNote = encryptData(note);
+
+    // Process with LLM to extract checklist & plan
+    const { checklist, plan } = await processDoctorNotes(note);
+
+    // Cancel only the reminders created by this doctor for this patient
+    await Reminder.deleteMany({ patient: patientId, doctor: req.user._id });
+
+    // Save new doctor note
+    const newNote = new DoctorNote({
+      doctor: req.user._id,
+      patient: patientId,
+      encryptedNote,
+      checklist,
+      plan,
+    });
+    await newNote.save();
+
+    // Create new reminders with dynamic scheduling
+    const reminders = [];
+    plan.forEach((item) => {
+      const match = item.schedule.match(/(\d+) days?/i);
+      if (!match) return;
+
+      const duration = parseInt(match[1], 10);
+      let missedDays = 0;
+
+      for (let i = 0; i < duration + missedDays; i++) {
+        reminders.push({
+          patient: patientId,
+          doctor: req.user._id, // Ensure the reminder is linked to the doctor
           action: item.action,
           dueDate: addDays(new Date(), i), // Schedule daily reminders
           status: "pending",

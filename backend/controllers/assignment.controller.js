@@ -9,26 +9,25 @@ const AppError = require("../utils/appError");
  * @desc    Assigns a doctor to a patient.
  * @access  Private (Admin or Doctor only)
  * @route   POST /assign-doctor
- * @param   {string} req.body.patientId - ID of the patient.
  * @param   {string} req.body.doctorId - ID of the doctor.
  * @returns {Object} JSON response with assignment details.
  */
 exports.assignDoctor = catchAsync(async (req, res, next) => {
-  const { patientId, doctorId } = req.body;
+  const { doctorId } = req.body;
 
   const doctor = await Doctor.findById(doctorId);
   if (!doctor || doctor.role !== "doctor") {
     return next(new AppError("Doctor not found", 404));
   }
 
-  const patient = await User.findById(patientId);
+  const patient = await User.findById(req.user.id);
   if (!patient || patient.role !== "patient") {
     return next(new AppError("Patient not found", 404));
   }
 
   const existingAssignment = await Assignment.findOne({
     doctor: doctorId,
-    patient: patientId,
+    patient: req.user.id,
   });
   if (existingAssignment) {
     return next(
@@ -38,7 +37,7 @@ exports.assignDoctor = catchAsync(async (req, res, next) => {
 
   const assignment = await Assignment.create({
     doctor: doctorId,
-    patient: patientId,
+    patient: req.user.id,
   });
 
   res.status(201).json({ message: "Doctor assigned successfully", assignment });

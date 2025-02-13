@@ -6,7 +6,7 @@ const { comparePassword, hashPassword } = require("../helpers/auth");
 const AppError = require("../utils/appError");
 
 exports.register = async (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, name, password, role } = req.body;
   try {
     let user = null;
     if (role === "patient") {
@@ -26,15 +26,15 @@ exports.register = async (req, res) => {
         email,
         name,
         password: newPassword,
-        role: "patient",
+        role,
       });
     }
     if (role === "doctor") {
       user = new Doctor({
         email,
         name,
-        password: hashPassword,
-        role: "doctor",
+        password: newPassword,
+        role,
       });
     }
     await user.save();

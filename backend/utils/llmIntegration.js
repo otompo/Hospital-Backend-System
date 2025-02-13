@@ -42,7 +42,7 @@ exports.processDoctorNotes = async (note) => {
     const completion = response.data.choices[0]?.message?.content?.trim();
     if (!completion) throw new Error("Empty response from LLM");
 
-    console.log("Raw LLM Response:", completion); // Debugging output
+    // console.log("Raw LLM Response:", completion); // Debugging output
 
     // ✅ Extract JSON from markdown block (removes ```json ... ```)
     const jsonMatch = completion.match(/```json\n([\s\S]+?)\n```/);
