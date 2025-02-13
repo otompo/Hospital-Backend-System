@@ -18,8 +18,13 @@ Endpoints for user signup, login, and authentication.
 Endpoints for assigning doctors to patients.
 
 - **Assign Doctor to Patient**
+
   - `POST /api/assign`
   - Allows patients to select a doctor for medical consultation.
+
+- **Get My Assigned Doctors**
+  - `GET /api/my-assigned-doctors`
+  - Retrieves a list of doctors assigned to a specific patient.
 
 ## Doctor Management
 
@@ -44,8 +49,13 @@ Endpoints for doctors to submit notes and manage follow-up actions.
   - Doctors submit notes about a patient’s condition and treatment plan.
 
 - **Get Doctor’s Notes**
+
   - `GET /api/notes/doctor`
   - Retrieves a doctor’s submitted notes for review.
+
+- **Get Patient Notes**
+  - `GET /api/notes/patient`
+  - Retrieves medical notes related to a specific patient.
 
 ## Reminders & Follow-Ups
 
