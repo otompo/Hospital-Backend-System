@@ -14,7 +14,7 @@ const app = express();
 
 // Middlewares
 app.use(cors("*"));
-app.use(express.json({ limit: "60mb" }));
+app.use(express.json({ limit: "70mb" }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
