@@ -4,7 +4,7 @@ exports.generateTokens = (user) => {
   const tokenPayload = {
     id: user._id,
     username: user.username,
-    role: user.role.name, // Assuming role has a 'name' field
+    role: user.role, // Assuming role has a 'name' field
   };
 
   const accessToken = jwt.sign(tokenPayload, process.env.JWT_ACCESS_SECRET, {
